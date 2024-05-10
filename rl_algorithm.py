@@ -99,7 +99,7 @@ class DQN:
         self.warmup_steps = warmup_steps
         self.target_update_interval = target_update_interval
 
-        self.device = 'cpu' #torch.device('cuda' if torch.cuda.is_available else 'cpu')
+        self.device = torch.device('cuda' if torch.cuda.is_available else 'cpu')
 
         "*** YOUR CODE HERE ***"
         # utils.raiseNotDefined()
