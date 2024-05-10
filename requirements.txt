@@ -1,0 +1,10 @@
+opencv-python
+gymnasium[atari]
+gymnasium[accept-rom-license]
+numpy
+matplotlib
+opencv-python
+imageio-ffmpeg
+imageio
+torch
+torchvision
