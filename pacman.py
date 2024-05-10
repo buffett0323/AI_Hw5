@@ -140,7 +140,11 @@ def evaluate(agent, eval_env, capture_frames=True):
     if agent is None:
         "*** YOUR CODE HERE ***"
         # utils.raiseNotDefined()
-        model_path = 'model_pth/model_10000.pth'  # Update this path as needed
+        model_path = args.eval_model_path
+        action_dim = eval_env.action_space.n
+        state_dim = (args.num_envs, args.image_hw, args.image_hw)
+        agent = DQN(state_dim=state_dim, action_dim=action_dim)
+    
         agent.network.load_state_dict(torch.load(model_path))
         agent.network.eval()
     
