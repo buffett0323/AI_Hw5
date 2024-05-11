@@ -6,6 +6,7 @@ import utils
 # Self-added
 import torch.optim as optim
 from collections import deque
+from torch.optim.lr_scheduler import StepLR
 
 class PacmanActionCNN(nn.Module):
     def __init__(self, state_dim, action_dim):
@@ -25,6 +26,7 @@ class PacmanActionCNN(nn.Module):
         self.fc_layers = nn.Sequential(
             nn.Linear(3136, 512), #linear_input_size
             nn.ReLU(),
+            nn.Dropout(0.5),  # Adding dropout for regularization
             nn.Linear(512, action_dim)
         )
 
@@ -116,6 +118,7 @@ class DQN:
         self.target_network.to(self.device)
 
         self.optimizer = optim.Adam(self.network.parameters(), lr=lr)
+        self.scheduler = StepLR(self.optimizer, step_size=10000, gamma=0.1)
         self.buffer = ReplayBuffer((4, 84, 84), (1,), buffer_size)  # Assuming state is an 84x84 grayscale image
         self.total_steps = 0
 
@@ -155,6 +158,9 @@ class DQN:
         reward = reward.to(self.device).squeeze()
         done = done.to(self.device).squeeze()
         
+        # Normalize rewards
+        rewards = torch.tensor(self.normalize_rewards(rewards.numpy()), device=self.device, dtype=torch.float32)
+
         # Forward pass through the current network
         current_q = self.network(state).gather(1, action.unsqueeze(1)).squeeze(1)
 
@@ -162,7 +168,7 @@ class DQN:
         # Forward pass through the target network
         next_q_values = self.target_network(next_state).detach()
         max_next_q = next_q_values.max(1)[0]  # A vector of max values
-        expected_q = reward + self.gamma * max_next_q * (1 - done)
+        expected_q = rewards + self.gamma * max_next_q * (1 - done)
         expected_q = expected_q.squeeze() # Make sure expected_q is a 1D vector
 
         # Compute loss
@@ -171,7 +177,12 @@ class DQN:
         # Backpropagation
         self.optimizer.zero_grad()
         loss.backward()
+        
+        # Implement gradient clipping
+        nn.utils.clip_grad_norm_(self.network.parameters(), max_norm=1.0)
+
         self.optimizer.step()
+        self.scheduler.step()
         self.losses.append(loss.item())  # Append the loss after each batch update
 
         return {'loss': loss.item()} # return the information you need for logging
@@ -198,3 +209,10 @@ class DQN:
         self.rewards.append(transition[2])
 
         return info # return the information you need for logging
+    
+    # Self-added functions
+    def normalize_rewards(self, rewards):
+        mean = np.mean(rewards)
+        std = np.std(rewards)
+        normalized_rewards = (rewards - mean) / (std + 1e-8)  # Avoid division by zero
+        return normalized_rewards
