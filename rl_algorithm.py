@@ -13,30 +13,37 @@ class PacmanActionCNN(nn.Module):
         "*** YOUR CODE HERE ***"
         # utils.raiseNotDefined()
         # define the network
-        self.conv_layers = nn.Sequential(
-            nn.Conv2d(4, 32, kernel_size=8, stride=4),
-            nn.ReLU(),
-            nn.Conv2d(32, 64, kernel_size=4, stride=2),
-            nn.ReLU(),
-            nn.Conv2d(64, 64, kernel_size=3, stride=1),
-            nn.ReLU()
-        )
+        # self.conv_layers = nn.Sequential(
+        #     nn.Conv2d(4, 32, kernel_size=8, stride=4),
+        #     nn.ReLU(),
+        #     nn.Conv2d(32, 64, kernel_size=4, stride=2),
+        #     nn.ReLU(),
+        #     nn.Conv2d(64, 64, kernel_size=3, stride=1),
+        #     nn.ReLU()
+        # )
         
-        self.fc_layers = nn.Sequential(
-            nn.Linear(3136, 512), #linear_input_size
-            nn.ReLU(),
-            nn.Linear(512, action_dim)
-        )
+        # self.fc_layers = nn.Sequential(
+        #     nn.Linear(3136, 512), #linear_input_size
+        #     nn.ReLU(),
+        #     nn.Linear(512, action_dim)
+        # )
+        self.fc1 = nn.Linear(state_dim, 64)
+        self.fc2 = nn.Linear(64, 64)
+        self.fc3 = nn.Linear(64, action_dim)
+
 
     def forward(self, x):
         "*** YOUR CODE HERE ***"
         # utils.raiseNotDefined()
         # forward pass
-        x = self.conv_layers(x)
-        x = x.view(x.size(0), -1)  # Flatten the output for the fully connected layers
-        x = self.fc_layers(x)
+        # x = self.conv_layers(x)
+        # x = x.view(x.size(0), -1)  # Flatten the output for the fully connected layers
+        # x = self.fc_layers(x)
         
-        return x
+        # return x
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        return self.fc3(x)
 
 class ReplayBuffer:
     def __init__(self, state_dim, action_dim, max_size=int(1e5)):
