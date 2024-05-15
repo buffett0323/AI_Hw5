@@ -15,7 +15,7 @@ class PacmanActionCNN(nn.Module):
         # utils.raiseNotDefined()
         # define the network
         self.conv_layers = nn.Sequential(
-            nn.Conv2d(4, 32, kernel_size=8, stride=4),
+            nn.Conv2d(state_dim[0], 32, kernel_size=8, stride=4),
             nn.ReLU(),
             nn.Conv2d(32, 64, kernel_size=4, stride=2),
             nn.ReLU(),
@@ -158,6 +158,9 @@ class DQN:
         reward = reward.to(self.device).squeeze()
         done = done.to(self.device).squeeze()
         
+        # Clip the rewards to a certain range, e.g., between -1 and 1
+        reward = torch.clamp(reward, -1, 1)
+        
         # Forward pass through the current network
         current_q = self.network(state).gather(1, action.unsqueeze(1)).squeeze(1)
         
@@ -168,7 +171,8 @@ class DQN:
         expected_q = expected_q.squeeze() # Make sure expected_q is a 1D vector
 
         # Compute loss
-        loss = nn.functional.mse_loss(current_q, expected_q)
+        # loss = nn.functional.mse_loss(current_q, expected_q)
+        loss = F.huber_loss(current_q, expected_q)
 
         # Backpropagation
         self.optimizer.zero_grad()
