@@ -24,10 +24,10 @@ class PacmanActionCNN(nn.Module):
         )
         
         self.fc_layers = nn.Sequential(
-            nn.Linear(3136, 256), #linear_input_size
+            nn.Linear(3136, 512), #linear_input_size
             nn.ReLU(),
             # nn.Dropout(0.5),  # Adding dropout for regularization
-            nn.Linear(256, action_dim)
+            nn.Linear(512, action_dim)
         )
         
         # Initialize weights using Xavier initialization
