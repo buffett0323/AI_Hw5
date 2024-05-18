@@ -98,6 +98,7 @@ def train(agent, env):
     logging_info = {'Step': [], 'AvgScore': []}
 
     (state, _) = env.reset()
+    result_record = []
     
     for _ in tqdm(range(args.max_steps)):
         
@@ -128,9 +129,15 @@ def train(agent, env):
             logging_info['AvgScore'].append(avg_score)
             
             # save model
-            print("Step: {}, AvgScore: {}".format(agent.total_steps, avg_score))
+            res = f"Step: {agent.total_steps}, AvgScore: {avg_score}"
+            result_record.append(res)
+            print(res)
             torch.save(agent.network.state_dict(), f'model_pth/model_{agent.total_steps}.pth')
 
+    with open("score_record.txt", "w") as file:
+        # Write each item to the file, one per line
+        for item in result_record:
+            file.write(item + "\n")
 
 
 def evaluate(agent, eval_env, capture_frames=True):

@@ -24,11 +24,30 @@ class PacmanActionCNN(nn.Module):
         )
         
         self.fc_layers = nn.Sequential(
-            nn.Linear(3136, 512), #linear_input_size
+            nn.Linear(3136, 256), #linear_input_size
             nn.ReLU(),
             # nn.Dropout(0.5),  # Adding dropout for regularization
-            nn.Linear(512, action_dim)
+            nn.Linear(256, action_dim)
         )
+        
+        # Initialize weights using Xavier initialization
+        self._initialize_weights()
+
+
+    def _initialize_weights(self):
+        # Apply Xavier initialization to convolutional layers
+        for layer in self.conv_layers:
+            if isinstance(layer, nn.Conv2d):
+                nn.init.xavier_uniform_(layer.weight)
+                if layer.bias is not None:
+                    nn.init.zeros_(layer.bias)
+                    
+        # Apply Xavier initialization to fully connected layers
+        for layer in self.fc_layers:
+            if isinstance(layer, nn.Linear):
+                nn.init.xavier_uniform_(layer.weight)
+                if layer.bias is not None:
+                    nn.init.zeros_(layer.bias)
 
 
     def forward(self, x):
@@ -118,7 +137,7 @@ class DQN:
         self.target_network.to(self.device)
 
         self.optimizer = optim.Adam(self.network.parameters(), lr=lr)
-        self.scheduler = StepLR(self.optimizer, step_size=10000, gamma=0.9)
+        self.scheduler = StepLR(self.optimizer, step_size=10000, gamma=0.95)
         self.buffer = ReplayBuffer((4, 84, 84), (1,), buffer_size)  # Assuming state is an 84x84 grayscale image
         self.total_steps = 0
 
@@ -158,8 +177,8 @@ class DQN:
         reward = reward.to(self.device).squeeze()
         done = done.to(self.device).squeeze()
         
-        # Clip the rewards to a certain range, e.g., between -1 and 1
-        reward = torch.clamp(reward, -1, 1)
+        # # Clip the rewards to a certain range, e.g., between -1 and 1
+        # reward = torch.clamp(reward, -1, 1)
         
         # Forward pass through the current network
         current_q = self.network(state).gather(1, action.unsqueeze(1)).squeeze(1)
@@ -181,7 +200,7 @@ class DQN:
         self.scheduler.step()
         self.losses.append(loss.item())  # Append the loss after each batch update
 
-        self.soft_update(self.network, self.target_network, 1e-3) 
+        self.soft_update(self.network, self.target_network, 5e-3) 
         return {'loss': loss.item()} # return the information you need for logging
     
     
