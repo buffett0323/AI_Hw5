@@ -21,5 +21,11 @@ I have a already trained model weights in the submissions folder, named "pacman_
 Please make sure you run in GPU since it's stored in torch.cuda.is_available()
 ```bash
 # For evaluation, please run
+python pacman.py --eval --eval_model_path submissions/pacman_dqn.pt
+# Or (That's actually the same)
 python pacman.py --eval --eval_model_path submissions/pacman_dqn.pth
 ```
+
+### Other info
+I stored the scores every 10000 epochs in `records/score_record.txt`.<br>
+Also, I plot the curves for both loss and rewards in `records/Loss_and_Rewards.png`.
