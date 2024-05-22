@@ -3,9 +3,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 import utils
+
 # Self-added
 import torch.optim as optim
-from collections import deque
 from torch.optim.lr_scheduler import StepLR
 
 class PacmanActionCNN(nn.Module):

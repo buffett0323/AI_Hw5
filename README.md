@@ -1,8 +1,25 @@
 # AI_Hw5
-Plot your training curve, including both loss and rewards. (3%)
+### Author: B09208038 地理四 劉正悅
 
-Ref: 
-1. https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
-2. https://github.com/udacity/deep-reinforcement-learning/blob/master/dqn/solution/dqn_agent.py
-3. https://github.com/gorkemguneser/Deep-Q-Learning-PACMAN/blob/main/final_version_v1.ipynb
-4. https://github.com/rudra2112/Pac-Man-DQN/blob/main/PacmanDQN.ipynb
+### Packages required
+I didn't add any new packages in requirements.txt, so it's the same as [HW5_PPT](https://docs.google.com/presentation/d/1enBQeAZwnNpqga9D7C8EezGplVjcS8T4/edit#slide=id.g2da8fe6dc22_57_12)
+
+```bash
+# First, install the needed packages for this task by running
+pip install -r requirements.txt
+```
+
+### Training
+```bash
+# With all of the parameters using default values
+# For training, please run
+python pacman.py
+```
+
+### Evaluation
+I have a already trained model weights in the submissions folder, named "pacman_dqn.pth". <br>
+Please make sure you run in GPU since it's stored in torch.cuda.is_available()
+```bash
+# For evaluation, please run
+python pacman.py --eval --eval_model_path submissions/pacman_dqn.pth
+```
